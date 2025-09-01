@@ -41,34 +41,43 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void createCategory(Category category) {
+    public CategoryDTO createCategory(CategoryDTO CategoryDTO) {
 //      category.setCategoryId(nextId++);
-        Category savedCategory = categoryRepository.findByCategoryName(category.getCategoryName());
-        if(savedCategory != null){
-            throw new APIException("Category with name " + category.getCategoryName() + " already exists");
+        // map the client's info to what we will store in the db
+        Category category = modelMapper.map(CategoryDTO,Category.class);
+        Category  categoryFromDb = categoryRepository.findByCategoryName(CategoryDTO.getCategoryName());
+        if(categoryFromDb != null){
+            throw new APIException("Category with name " + CategoryDTO.getCategoryName() + " already exists");
         }
-        categoryRepository.save(category);
+        Category savedCategory = categoryRepository.save(category);
+        // after save to db, we turn entity -> DTO for controller to use
+        return modelMapper.map(savedCategory,CategoryDTO.class);
     }
 
     @Override
-    public String deleteCategory( Long categoryId) {
+    public CategoryDTO deleteCategory( Long categoryId) {
         //first find the category that need to delete
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "CategoryId",categoryId));
+        //delete entity in db
         categoryRepository.delete(category);
-        return "Category with " + categoryId + " deleted successfully";
+        CategoryDTO categoryDTO = modelMapper.map(category,CategoryDTO.class);
+        return categoryDTO;
+
     }
 
     @Override
-    public Category updateCategory(Category category, Long categoryId) {
+    public CategoryDTO updateCategory(CategoryDTO CategoryDTO, Long categoryId) {
 
         //if not exit id then throw exception
         Category savedCategory  =  categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "CategoryId",categoryId));;
 
-        //if exit id then save it
+        //if exit id then save it, but first need to make DTO->entity to save in db
+        Category category = modelMapper.map(CategoryDTO,Category.class);
         category.setCategoryId(categoryId);
+        // after save, we make entity->DTO for controller to use
         savedCategory =  categoryRepository.save(category);
-        return savedCategory;
+        return modelMapper.map(savedCategory,CategoryDTO.class);
     }
 }
