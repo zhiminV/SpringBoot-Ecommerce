@@ -21,11 +21,19 @@ public class CategoryController {
     @Autowired
     private CategoryService categoryService;
 
+    @GetMapping("/echo")
+    public ResponseEntity<String> echoMessage (@RequestParam(name = "message") String massage) {
+        return new ResponseEntity<>("Echoed message: " + massage, HttpStatus.OK);
+    }
+
 //    @GetMapping("/api/public/categories")
     @RequestMapping(value ="/public/categories" , method = RequestMethod.GET )
-    public ResponseEntity<CategoryResponse> getAllCategories()
+    public ResponseEntity<CategoryResponse> getAllCategories(
+            @RequestParam(name="pageNumber") Integer pageNumber,
+            @RequestParam(name="pageSize") Integer pageSize
+    )
     {
-        CategoryResponse CategoryResponse = categoryService.getAllCategories();
+        CategoryResponse CategoryResponse = categoryService.getAllCategories(pageNumber, pageSize);
         return new ResponseEntity<>(CategoryResponse, HttpStatus.OK);
     }
 
