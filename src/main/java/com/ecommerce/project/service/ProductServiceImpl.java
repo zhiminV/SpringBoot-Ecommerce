@@ -5,11 +5,16 @@ import com.ecommerce.project.exceptions.ResourceNotFoundException;
 import com.ecommerce.project.model.Category;
 import com.ecommerce.project.model.Product;
 import com.ecommerce.project.payload.ProductDTO;
+import com.ecommerce.project.payload.ProductResponse;
 import com.ecommerce.project.repositories.CategoryRepository;
 import com.ecommerce.project.repositories.ProductReposository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -36,4 +41,19 @@ public class ProductServiceImpl implements ProductService {
         Product savaedProduct = productReposository.save(product);
         return modelMapper.map(savaedProduct, ProductDTO.class);
     }
+
+    @Override
+    public ProductResponse getAllProducts() {
+        //find all product in db
+        List<Product> products = productReposository.findAll();
+        //map each item in product list to DTOs to present in frontend
+        List<ProductDTO> productDTOS = products.stream()
+                .map(product -> modelMapper.map(product, ProductDTO.class))
+                .toList();
+        //put DTO list into ProductResponse and return
+        ProductResponse productResponse = new ProductResponse();
+        productResponse.setContent(productDTOS);
+        return productResponse;
+    }
+
 }
