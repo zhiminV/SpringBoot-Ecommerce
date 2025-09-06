@@ -4,6 +4,7 @@ import com.ecommerce.project.model.Product;
 import com.ecommerce.project.payload.ProductDTO;
 import com.ecommerce.project.payload.ProductResponse;
 import com.ecommerce.project.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class ProductController {
     ProductService productService;
 
     @PostMapping("/admin/categories/{categoryId}/product")
-    public ResponseEntity<ProductDTO> addProduct(@RequestBody ProductDTO ProductDTO,
+    public ResponseEntity<ProductDTO> addProduct(@Valid @RequestBody ProductDTO ProductDTO,
                                                  @PathVariable Long categoryId) {
         ProductDTO savedproductDTO = productService.addProduct(categoryId, ProductDTO);
         return new ResponseEntity<>(savedproductDTO, HttpStatus.OK);
@@ -43,14 +44,13 @@ public class ProductController {
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
     @PutMapping("/admin/products/{productId}")
-    public ResponseEntity<ProductDTO> updateProduct(@RequestBody ProductDTO ProductDTO,
+    public ResponseEntity<ProductDTO> updateProduct(@Valid @RequestBody ProductDTO ProductDTO,
                                                  @PathVariable Long productId) {
         ProductDTO updatedProductDTO = productService.updateProduct(productId, ProductDTO);
         return new ResponseEntity<>(updatedProductDTO, HttpStatus.OK);
     }
     @DeleteMapping("/admin/products/{productId}")
-    public ResponseEntity<ProductDTO> deleteProduct(
-                                                    @PathVariable Long productId) {
+    public ResponseEntity<ProductDTO> deleteProduct(@PathVariable Long productId) {
         ProductDTO deleteProductDTO = productService.deleteProduct(productId);
         return new ResponseEntity<>(deleteProductDTO, HttpStatus.OK);
     }
