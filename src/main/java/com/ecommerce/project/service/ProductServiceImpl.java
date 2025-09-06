@@ -7,22 +7,19 @@ import com.ecommerce.project.model.Product;
 import com.ecommerce.project.payload.ProductDTO;
 import com.ecommerce.project.payload.ProductResponse;
 import com.ecommerce.project.repositories.CategoryRepository;
-import com.ecommerce.project.repositories.ProductReposository;
+import com.ecommerce.project.repositories.ProductRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
 
 
     @Autowired
-    private ProductReposository productReposository;
-
+    private ProductRepository productRepository;
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -38,14 +35,14 @@ public class ProductServiceImpl implements ProductService {
         product.setCategory(category);
         double specialPrice = product.getPrice()- ((product.getDiscount() * 0.01) * product.getPrice());
         product.setSpecialPrice(specialPrice);
-        Product savaedProduct = productReposository.save(product);
-        return modelMapper.map(savaedProduct, ProductDTO.class);
+        Product savedProduct = productRepository.save(product);
+        return modelMapper.map(savedProduct, ProductDTO.class);
     }
 
     @Override
     public ProductResponse getAllProducts() {
         //find all product in db
-        List<Product> products = productReposository.findAll();
+        List<Product> products = productRepository.findAll();
         //map each item in product list to DTOs to present in frontend
         List<ProductDTO> productDTOS = products.stream()
                 .map(product -> modelMapper.map(product, ProductDTO.class))
@@ -53,6 +50,24 @@ public class ProductServiceImpl implements ProductService {
         //put DTO list into ProductResponse and return
         ProductResponse productResponse = new ProductResponse();
         productResponse.setContent(productDTOS);
+        return productResponse;
+    }
+
+    @Override
+    public ProductResponse searchByCategory(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Category", "CategoryId", categoryId));
+
+        // get one product from category
+        List<Product> products = productRepository.findByCategoryOrderByPriceAsc(category);
+        List<ProductDTO> productDTOS = products.stream()
+                .map(product -> modelMapper.map(product, ProductDTO.class))
+                .toList();
+        //put DTO list into ProductResponse and return
+        ProductResponse productResponse = new ProductResponse();
+        productResponse.setContent(productDTOS);
+
         return productResponse;
     }
 
