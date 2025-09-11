@@ -1,6 +1,7 @@
 package com.ecommerce.project.security.service;
 
 import com.ecommerce.project.model.User;
+import com.ecommerce.project.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
