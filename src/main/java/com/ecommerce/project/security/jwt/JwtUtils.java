@@ -16,35 +16,33 @@ import java.util.Date;
 
 @Component
 public class JwtUtils {
-    // Getting JWT from Header
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
     @Value("${spring.app.jwtSecret}")
     private String jwtSecret;
+
     @Value("${spring.app.jwtExpirationMs}")
     private int jwtExpirationMs;
 
     public String getJwtFromHeader(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        logger.debug("Authorization Hearder : {}", bearerToken);
+        logger.debug("Authorization Header: {}", bearerToken);
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7); //Remove Bearer prefix
+            return bearerToken.substring(7); // Remove Bearer prefix
         }
         return null;
     }
 
-    //Generating Token from Username
     public String generateTokenFromUsername(UserDetails userDetails) {
         String username = userDetails.getUsername();
         return Jwts.builder()
                 .subject(username)
                 .issuedAt(new Date())
-                .expiration(new Date(new Date().getTime() + jwtExpirationMs))
+                .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
                 .signWith(key())
                 .compact();
     }
 
-    //Getting Username form JWT token
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parser()
                 .verifyWith((SecretKey) key())
@@ -52,12 +50,10 @@ public class JwtUtils {
                 .getPayload().getSubject();
     }
 
-    //Generate Signing key
     private Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
-    //Validate JWT token
     public boolean validateJwtToken(String authToken) {
         try {
             System.out.println("Validate");
@@ -74,5 +70,4 @@ public class JwtUtils {
         }
         return false;
     }
-
 }
