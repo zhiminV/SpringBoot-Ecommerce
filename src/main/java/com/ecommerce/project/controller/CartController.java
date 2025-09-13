@@ -2,6 +2,7 @@ package com.ecommerce.project.controller;
 
 
 import com.ecommerce.project.model.Cart;
+import com.ecommerce.project.model.CartItem;
 import com.ecommerce.project.payload.CartDTO;
 import com.ecommerce.project.repositories.CartRepository;
 import com.ecommerce.project.service.CartService;
@@ -51,4 +52,14 @@ public class CartController {
         CartDTO cartDTO = cartService.getCart(emailId,cartId);
         return new ResponseEntity<CartDTO>(cartDTO,HttpStatus.OK);
     }
+
+    @PutMapping("cart/products/{productId}/quantity/{operation}")
+    public ResponseEntity<CartDTO> updateCartProduct(@PathVariable Long productId,
+                                                     @PathVariable String operation) {
+        CartDTO cartDTO = cartService.updateProductQuantityInCart(productId,
+                operation.equalsIgnoreCase("delete") ?-1:1);
+        return new ResponseEntity<CartDTO>(cartDTO, HttpStatus.OK);
+    }
+
+
 }
