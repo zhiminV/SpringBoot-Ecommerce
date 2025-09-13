@@ -160,14 +160,24 @@ public class CartServiceImpl implements CartService{
             throw new APIException("Product " + product.getProductName() + " does not exist in the cart");
         }
 
+        //Calculate new quantity
+        int newQuantity = cartItem.getQuantity() + quantity;
+        //validation to the prevent negative quantities
+        if (newQuantity < 0) {
+            throw new  APIException("The requested quantity can not be less than 0");
+        }
+        if (newQuantity == 0) {
+            deleteProductFromCart(cartId, productId);
+        } else {
         cartItem.setProductPrice(product.getSpecialPrice());
         cartItem.setQuantity(cartItem.getQuantity() + quantity);
         cartItem.setDiscount(product.getDiscount());
         //quantity updated so we need to update the total price
         cart.setTotalPrice(cart.getTotalPrice() + (cartItem.getProductPrice() * quantity));
         cartRepository.save(cart);
-        CartItem updatedCartItem = cartItemRepository.save(cartItem);
+        }
 
+        CartItem updatedCartItem = cartItemRepository.save(cartItem);
 
         if(updatedCartItem.getQuantity() == 0) {
             cartItemRepository.deleteById(updatedCartItem.getCartItemId());
@@ -186,6 +196,8 @@ public class CartServiceImpl implements CartService{
         return cartDTO;
     }
 
+
+    @Transactional
     @Override
     public String deleteProductFromCart(Long cartId, Long productId) {
         Cart cart = cartRepository.findById(cartId)
