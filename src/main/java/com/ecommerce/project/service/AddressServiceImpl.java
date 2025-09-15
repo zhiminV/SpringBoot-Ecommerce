@@ -40,4 +40,11 @@ public class AddressServiceImpl implements AddressService {
                 .toList();
         return addressDTOS;
     }
+
+    @Override
+    public AddressDTO getAddressesById(Long addressId) {
+        Address address = addressRepository.findById(addressId)
+                .orElseThrow(()->new RuntimeException("Address not found"));
+        return modelMapper.map(address,AddressDTO.class);
+    }
 }
