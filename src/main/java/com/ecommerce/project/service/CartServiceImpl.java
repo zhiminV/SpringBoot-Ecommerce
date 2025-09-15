@@ -94,24 +94,29 @@ public class CartServiceImpl implements CartService{
 
     @Override
     public List<CartDTO> getAllCarts() {
-        // get all cart and find the high value but not checkout in the cart
         List<Cart> carts = cartRepository.findAll();
-        if (carts.isEmpty()) {
-            throw new APIException("No carts found");
-        }
-        List<CartDTO> cartDTOS = carts.stream()
-                .map(cart -> {
-                    CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
-                    // Cart has cartItem,  CartItem has product
-                    // transfer each product in the CartItem to ProductDTO
-                    List<ProductDTO> products = cart.getCartItems().stream()
-                            .map(p-> modelMapper.map(p.getProduct(),ProductDTO.class))
-                            .collect(Collectors.toList());
-                    cartDTO.setProducts(products);
-                    return cartDTO;
-                }).collect(Collectors.toList());
 
-        return cartDTOS;
+        if (carts.size() == 0) {
+            throw new APIException("No cart exists");
+        }
+
+        List<CartDTO> cartDTOs = carts.stream().map(cart -> {
+            CartDTO cartDTO = modelMapper.map(cart, CartDTO.class);
+
+            List<ProductDTO> products = cart.getCartItems().stream().map(cartItem -> {
+                ProductDTO productDTO = modelMapper.map(cartItem.getProduct(), ProductDTO.class);
+                productDTO.setQuantity(cartItem.getQuantity()); // Set the quantity from CartItem
+                return productDTO;
+            }).collect(Collectors.toList());
+
+
+            cartDTO.setProducts(products);
+
+            return cartDTO;
+
+        }).collect(Collectors.toList());
+
+        return cartDTOs;
     }
 
     @Override
@@ -134,7 +139,7 @@ public class CartServiceImpl implements CartService{
     public CartDTO updateProductQuantityInCart(Long productId, Integer quantity) {
         // how to get cartId, we can find user email when user login from authUtil
         String emailId = authUtil.loggedInEmail();
-        Cart usrCart = cartRepository.findByUserEmail(emailId);
+        Cart usrCart = cartRepository.findCartByEmail(emailId);
         Long cartId = usrCart.getCartId();
 
         Cart cart = cartRepository.findById(cartId)
@@ -234,7 +239,7 @@ public class CartServiceImpl implements CartService{
     }
 
     private Cart createCart() {
-        Cart userCart  = cartRepository.findByUserEmail(authUtil.loggedInEmail());
+        Cart userCart  = cartRepository.findCartByEmail(authUtil.loggedInEmail());
         if(userCart != null){
             return userCart;
         }

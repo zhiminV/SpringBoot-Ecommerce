@@ -75,10 +75,9 @@ public class OrderServiceImpl implements OrderService {
             orderItem.setOrderedProductPrice(cartItem.getProductPrice());
             orderItem.setOrder(savedOrder);
             orderItems.add(orderItem);
-
-            orderItems = orderItemRepository.saveAll(orderItems);
-
         }
+
+        orderItems = orderItemRepository.saveAll(orderItems);
 
         //Update product stock
         cart.getCartItems().forEach(item -> {
@@ -94,10 +93,8 @@ public class OrderServiceImpl implements OrderService {
 
         //Sent back the order summary
         OrderDTO orderDTO = modelMapper.map(savedOrder, OrderDTO.class);
-        orderItems.forEach(item ->
-                orderDTO.getOrderItems().add(
-                        modelMapper.map(item, OrderItemDTO.class)
-                ));
+        orderItems.forEach(item -> orderDTO.getOrderItems().add(modelMapper.map(item, OrderItemDTO.class)));
+
         orderDTO.setAddressId(addressId);
 
         return orderDTO;

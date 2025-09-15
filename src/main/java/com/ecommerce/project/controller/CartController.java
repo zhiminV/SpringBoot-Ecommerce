@@ -45,7 +45,7 @@ public class CartController {
     public ResponseEntity<CartDTO> getCartsByUserId() {
         String emailId = authUtil.loggedInEmail();
         // get cart object then get the id
-        Cart cart = cartRepository.findByUserEmail(emailId);
+        Cart cart = cartRepository.findCartByEmail(emailId);
         Long cartId = cart.getCartId();
 
         // for future scalability ,eg, one user(B2B) can have more cart
