@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @Table(name="addresses")
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class Address {
 
     @Id
@@ -42,12 +44,13 @@ public class Address {
     private String Country;
 
     @NotBlank
-    @Size(min = 6, message = "Pincode must contains at least 6 characters")
+    @Size(min = 5, message = "Pincode must contains at least 5 characters")
     private String pincode;
 
-    @ToString.Exclude // if we want to
-    @ManyToMany(mappedBy = "addresses")
-    private List<User> users = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public Address(String street, String buildingName, String city, String state, String country, String pincode, List<User> users) {
         this.street = street;
@@ -56,6 +59,7 @@ public class Address {
         State = state;
         Country = country;
         this.pincode = pincode;
-        this.users = users;
+        this.user = user;
     }
+
 }
