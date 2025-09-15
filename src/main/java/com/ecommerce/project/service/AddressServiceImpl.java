@@ -47,4 +47,13 @@ public class AddressServiceImpl implements AddressService {
                 .orElseThrow(()->new RuntimeException("Address not found"));
         return modelMapper.map(address,AddressDTO.class);
     }
+
+    @Override
+    public List<AddressDTO> getUserAddresses(User user) {
+        List<Address>  addresses = user.getAddresses();
+        List<AddressDTO> addressDTOS = addresses.stream()
+                .map(address->modelMapper.map(address,AddressDTO.class))
+                .toList();
+        return addressDTOS;
+    }
 }
