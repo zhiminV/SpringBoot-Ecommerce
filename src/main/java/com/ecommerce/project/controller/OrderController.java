@@ -4,6 +4,7 @@ import com.ecommerce.project.model.OrderItem;
 import com.ecommerce.project.payload.OrderDTO;
 import com.ecommerce.project.payload.OrderRequestDTO;
 import com.ecommerce.project.repositories.OrderItemRepository;
+import com.ecommerce.project.service.OrderService;
 import com.ecommerce.project.util.AuthUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,7 @@ public class OrderController {
                 orderRequestDTO.getAddressId(),
                 paymentMethod,
                 orderRequestDTO.getPgName(),
-                orderRequestDTO.getPaymentId(),
+                orderRequestDTO.getPgPaymentId(),
                 orderRequestDTO.getPgStatus(),
                 orderRequestDTO.getPgResponseMessage()
         );
